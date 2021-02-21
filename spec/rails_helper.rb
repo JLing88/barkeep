@@ -73,6 +73,15 @@ Shoulda::Matchers.configure do |config|
   end
 end
 
+DatabaseCleaner.strategy = :truncation
+
 RSpec.configure do |config|
   config.include FactoryBot::Syntax::Methods
+
+  config.before(:each) do
+    DatabaseCleaner.clean
+  end
+  config.after(:each) do
+    DatabaseCleaner.clean
+  end
 end
