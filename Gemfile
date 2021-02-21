@@ -25,6 +25,8 @@ gem 'puma', '~> 3.11'
 # Reduces boot times through caching; required in config/boot.rb
 gem 'bootsnap', '>= 1.1.0', require: false
 
+gem 'fast_jsonapi'
+
 # Use Rack CORS for handling Cross-Origin Resource Sharing (CORS), making cross-origin AJAX possible
 # gem 'rack-cors'
 
@@ -45,8 +47,8 @@ end
 
 group :test do
   gem 'simplecov', require: false
-  gem 'shoulda-matchers'
-  gem 'factory_bot'
+  gem 'factory_bot_rails'
+  gem 'database_cleaner'
 end
 
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
