@@ -24,4 +24,17 @@ class Api::V1::SearchesController < ApplicationController
 
     render json: "Search has been deleted", status: 200
   end
+
+  api :POST, '/v1/searches'
+  param :cocktail, Hash, required: true do
+    param :query, String, required: true
+  end
+  def create
+    
+  end
+
+  private
+  def cocktail_params
+    params.require(:cocktail).permit(:query)
+  end
 end

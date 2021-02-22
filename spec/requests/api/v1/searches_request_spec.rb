@@ -86,4 +86,11 @@ RSpec.describe "Api::V1::Searches", type: :request do
       expect(result["error"]).to eq("Couldn't find Search with 'id'=111")
     end
   end
+
+  describe 'POST #create' do
+    it 'can create a new Search object' do
+      expect(Search.count).to eq(0)
+      expect { post '/api/v1/searches?query=margarita', params: body }.to change { Search.count }.by(1)
+    end
+  end
 end
