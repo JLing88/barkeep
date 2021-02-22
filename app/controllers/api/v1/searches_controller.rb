@@ -14,6 +14,5 @@ class Api::V1::SearchesController < ApplicationController
 
     result = SearchSerializer.new(search).serializable_hash
     render json: result, status: 200
-    
   end
 end

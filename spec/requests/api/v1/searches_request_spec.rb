@@ -62,4 +62,17 @@ RSpec.describe "Api::V1::Searches", type: :request do
       expect(result["error"]).to eq("Couldn't find Search with 'id'=111")
     end
   end
+
+  describe 'GET #show' do
+    before(:each) do
+      @search_1 = create(:search)
+      @search_2 = Search.create!(query: 'mojito', url: 'https://www.thecocktaildb.com/api/json/v1/1/search.php?s=mojito')
+    end
+
+    it 'deletes search object associated with :id param' do
+      expect(Search.count).to eq(2)
+
+      expect { delete "/api/v1/searches/#{@search_2.id}" }.to change{ Search.count }.by(-1)
+    end
+  end
 end
