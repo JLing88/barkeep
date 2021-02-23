@@ -105,14 +105,17 @@ RSpec.describe "Api::V1::Searches", type: :request do
       result = JSON.parse(response.body)
 
       expect(response.status).to eq(200)
-      expect(result[:id])
+      expect(result).to have_key('id')
+      expect(result['query']).to eq(body[:cocktail][:query])
+      expect(result).to have_key('url')
+      expect(result).to have_key('results')
     end
 
     it 'returns 422 if invalid params are provided' do
-      body = { not_a_cocktail: { query: 'something' } }
+      invalid_body = { not_a_cocktail: { query: 'something' } }
 
       expect(Search.count).to eq(0)
-      expect { post '/api/v1/searches', params: body }.to_not change { Search.count }
+      expect { post '/api/v1/searches', params: invalid_body }.to_not change { Search.count }
 
       result = JSON.parse(response.body)
 
