@@ -4,7 +4,7 @@ RSpec.describe "Api::V1::Searches", type: :request do
   describe 'GET #index' do
     before(:each) do
       @search_1 = create(:search)
-      @search_2 = Search.create!(query: 'mojito', url: 'https://www.thecocktaildb.com/api/json/v1/1/search.php?s=mojito')
+      @search_2 = create(:search, query: "mojito")
     end
 
     it 'returns all searches' do
@@ -28,7 +28,7 @@ RSpec.describe "Api::V1::Searches", type: :request do
   describe 'GET #show' do
     before(:each) do
       @search_1 = create(:search)
-      @search_2 = Search.create!(query: 'mojito', url: 'https://www.thecocktaildb.com/api/json/v1/1/search.php?s=mojito')
+      @search_2 = create(:search, query: 'mojito')
     end
 
     it 'returns the Search object by id if found' do
@@ -65,7 +65,7 @@ RSpec.describe "Api::V1::Searches", type: :request do
   describe 'DELETE #destroy' do
     before(:each) do
       @search_1 = create(:search)
-      @search_2 = Search.create!(query: 'mojito', url: 'https://www.thecocktaildb.com/api/json/v1/1/search.php?s=mojito')
+      @search_2 = create(:search, query: 'mojito')
     end
 
     it 'deletes search object associated with :id param' do
@@ -89,11 +89,22 @@ RSpec.describe "Api::V1::Searches", type: :request do
 
   describe 'POST #create' do
     it 'can create a new Search object' do
-      body = { cocktail: {query: 'margarita'} }
+      body = { cocktail: { query: 'margarita' } }
 
       expect(Search.count).to eq(0)
-      binding.pry
       expect { post '/api/v1/searches', params: body }.to change { Search.count }.by(1)
+    end
+
+    it 'returns 422 if invalid params are provided' do
+      body = { not_a_cocktail: { query: 'something' } }
+
+      expect(Search.count).to eq(0)
+      expect { post '/api/v1/searches', params: body }.to_not change { Search.count }
+
+      result = JSON.parse(response.body)
+
+      expect(response.status).to eq(422)
+      expect(result['error']).to eq("Missing parameter cocktail")
     end
   end
 end
