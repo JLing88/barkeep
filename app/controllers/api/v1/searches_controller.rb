@@ -15,7 +15,7 @@ class Api::V1::SearchesController < ApplicationController
   param :id, :number, required: true, desc: 'id of the requested search object'
   def show
     search = Search.find(params[:id])
-    result = SearchSerializer.new(search).serializable_hash
+    result = SearchSerializer.new(search, include: [:cocktails]).serializable_hash
 
     render json: result, status: 200
   end

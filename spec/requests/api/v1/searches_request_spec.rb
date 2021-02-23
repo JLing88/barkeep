@@ -184,32 +184,66 @@ end
 
   describe 'GET #show' do
     before(:each) do
-      @search_1 = create(:search)
-      @search_2 = create(:search, query: 'mojito')
+      @margarita_search = create(:search)
+      @mojito_search = create(:search, query: 'mojito')
+
+      @classic_marg = @margarita_search.cocktails.create(
+        recipe: {
+          'strDrink': 'Classic Margarita',
+          'strIngredient1': 'tequila',
+          'strIngredient2': 'sweet and sour mix',
+          'strIngredient3': 'contreau'
+        }
+      )
+
+      @mango_lime_marg = @margarita_search.cocktails.create(
+        recipe: {
+          'strDrink': 'Mango Lime Margarita',
+          'strIngredient1': 'tequila',
+          'strIngredient2': 'sweet and sour mix',
+          'strIngredient3': 'contreau',
+          'strIngredient4': 'mango puree'
+        }
+      )
+
+      @classic_mojito = @mojito_search.cocktails.create(
+        recipe: {
+          'strDrink': 'Classic Old Fashioned',
+          'strIngredient1': 'rum',
+          'strIngredient2': 'mint',
+          'strIngredient3': 'lime',
+          'strIngredient4': 'soda water'
+        }
+      )
     end
 
     it 'returns the Search object by id if found' do
       expect(Search.count).to eq(2)
 
-      get "/api/v1/searches/#{@search_1.id}"
+      get "/api/v1/searches/#{@margarita_search.id}"
       results = JSON.parse(response.body)
       data = results['data']
 
       expect(response.status).to eq(200)
       expect(results).to have_key('data')
-      expect(data['attributes']['id']).to eq(@search_1.id)
-      expect(data['attributes']['query']).to eq(@search_1.query)
-      expect(data['attributes']['url']).to eq(@search_1.url)
-      expect(data['attributes']['results']).to eq(@search_1.results)
+      expect(data['attributes']['id']).to eq(@margarita_search.id)
+      expect(data['attributes']['query']).to eq(@margarita_search.query)
+      expect(data['attributes']['url']).to eq(@margarita_search.url)
+      expect(results['included'].length).to eq(2)
+      expect(results['included'][0]['id']).to eq(@classic_marg.id.to_s)
+      expect(results['included'][1]['id']).to eq(@mango_lime_marg.id.to_s)
 
-      get "/api/v1/searches/#{@search_2.id}"
+      get "/api/v1/searches/#{@mojito_search.id}"
       results = JSON.parse(response.body)
 
       expect(response.status).to eq(200)
       expect(results).to have_key('data')
-      expect(results['data']['attributes']['id']).to eq(@search_2.id)
-      expect(results['data']['attributes']['query']).to eq(@search_2.query)
-      expect(results['data']['attributes']['url']).to eq(@search_2.url)
+      expect(results['data']['attributes']['id']).to eq(@mojito_search.id)
+      expect(results['data']['attributes']['query']).to eq(@mojito_search.query)
+      expect(results['data']['attributes']['url']).to eq(@mojito_search.url)
+      expect(results['included'].length).to eq(1)
+      expect(results['included'][0]['id']).to eq(@classic_mojito.id.to_s)
+
     end
 
     it 'returns 404 not found if :id does not exist' do
@@ -223,16 +257,52 @@ end
 
   describe 'DELETE #destroy' do
     before(:each) do
-      @search_1 = create(:search)
-      @search_2 = create(:search, query: 'mojito')
+      # @search_2 = create(:search, query: 'mojito')
+
+      @margarita_search = create(:search)
+      @mojito_search = create(:search, query: 'mojito')
+
+      @classic_marg = @margarita_search.cocktails.create(
+        recipe: {
+          'strDrink': 'Classic Margarita',
+          'strIngredient1': 'tequila',
+          'strIngredient2': 'sweet and sour mix',
+          'strIngredient3': 'contreau'
+        }
+      )
+
+      @mango_lime_marg = @margarita_search.cocktails.create(
+        recipe: {
+          'strDrink': 'Mango Lime Margarita',
+          'strIngredient1': 'tequila',
+          'strIngredient2': 'sweet and sour mix',
+          'strIngredient3': 'contreau',
+          'strIngredient4': 'mango puree'
+        }
+      )
+
+      @classic_mojito = @mojito_search.cocktails.create(
+        recipe: {
+          'strDrink': 'Classic Old Fashioned',
+          'strIngredient1': 'rum',
+          'strIngredient2': 'mint',
+          'strIngredient3': 'lime',
+          'strIngredient4': 'soda water'
+        }
+      )
     end
 
     it 'deletes search object associated with :id param' do
       expect(Search.count).to eq(2)
-      expect { delete "/api/v1/searches/#{@search_2.id}" }.to change{ Search.count }.by(-1)
-      expect { delete "/api/v1/searches/#{@search_1.id}" }.to change{ Search.count }.by(-1)
+      expect(Cocktail.count).to eq(3)
+      expect { delete "/api/v1/searches/#{@mojito_search.id}" }.to change{ Search.count }.by(-1)
+      expect(response.status).to eq(200)
+      expect(Cocktail.count).to eq(2)
+
+      expect { delete "/api/v1/searches/#{@margarita_search.id}" }.to change{ Search.count }.by(-1)
       expect(response.body).to eq('Search has been deleted')
       expect(response.status).to eq(200)
+      expect(Cocktail.count).to eq(0)
     end
 
     it 'returns 404 not found if :id does not exist' do
