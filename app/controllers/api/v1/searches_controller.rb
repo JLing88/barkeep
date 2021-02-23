@@ -24,4 +24,35 @@ class Api::V1::SearchesController < ApplicationController
 
     render json: "Search has been deleted", status: 200
   end
+
+  api :POST, '/v1/searches'
+  param :cocktail, Hash, required: true do
+    param :query, String, required: true
+  end
+  def create
+    query = cocktail_params[:query]
+    existing_search = Search.find_by(query: query)
+    # if search is already in the database we'll just return that
+    render json: existing_search, status: 200 if existing_search
+
+    cocktail_search = cocktail_service(query)
+    results = cocktail_search.response.body
+    search = create_search(query, cocktail_search.url, results)
+
+    render json: search, status: 200
+  end
+
+  private
+
+  def cocktail_params
+    params.require(:cocktail).permit(:query)
+  end
+
+  def create_search(query, url, results)
+    Search.create!(query: query, url: url, results: results)
+  end
+
+  def cocktail_service(query)
+    CocktailService.new(query)
+  end
 end
