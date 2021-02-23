@@ -93,6 +93,7 @@ RSpec.describe "Api::V1::Searches", type: :request do
 
       expect(Search.count).to eq(0)
       expect { post '/api/v1/searches', params: body }.to change { Search.count }.by(1)
+      binding.pry
     end
 
     it 'returns 422 if invalid params are provided' do
