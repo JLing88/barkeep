@@ -5,7 +5,7 @@ RSpec.describe "Api::V1::Searches", type: :request do
     before(:each) do
       @search_1 = create(:search)
       @search_2 = create(:search, query: "mojito")
-      @search_3 = create(:search, query: "old fashioned")
+      @search_3 = create(:search, query: "old%20fashioned")
     end
 
     it 'returns all searches sorted by descending order of :updated_at by default' do
@@ -233,16 +233,15 @@ end
     end
 
     it 'can handle multiple word queries' do
-      body = { cocktail: { query: 'old fashioned' } }
+      body = { cocktail: { query: 'old%20fashioned' } }
 
       expect(Search.count).to eq(0)
       expect { post '/api/v1/searches', params: body }.to change { Search.count }.by(1)
 
       result = JSON.parse(response.body)
-
       expect(response.status).to eq(200)
       expect(result).to have_key('id')
-      expect(result['query']).to eq(body[:cocktail][:query])
+      expect(result['query']).to eq('old fashioned')
       expect(result).to have_key('url')
       expect(result).to have_key('results')
     end

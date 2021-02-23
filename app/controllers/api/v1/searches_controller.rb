@@ -35,6 +35,7 @@ class Api::V1::SearchesController < ApplicationController
   end
   def create
     query = cocktail_params[:query]
+
     existing_search = Search.find_by(query: query)
     # if search is already in the database we'll just return that
     render json: existing_search, status: 200 if existing_search
