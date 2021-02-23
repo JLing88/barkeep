@@ -6,7 +6,7 @@ class Api::V1::SearchesController < ApplicationController
   param :filter, String, required: false, desc: "provide 'alpha-asc' or alpha-desc' to sort alphabetically"
   def index
     searches = Search.all.order(sorted_by(params)).where('query LIKE ?', "%#{filter_by(params)}%")
-    results = SearchSerializer.new(searches).serializable_hash
+    results = SearchSerializer.new(searches, include: [:cocktails]).serializable_hash
 
     render json: results, status: 200
   end

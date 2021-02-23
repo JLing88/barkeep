@@ -6,11 +6,39 @@ RSpec.describe "Api::V1::Searches", type: :request do
       @search_1 = create(:search)
       @search_2 = create(:search, query: "mojito")
       @search_3 = create(:search, query: "old%20fashioned")
+
+      @search_1.cocktails.create(
+        recipe: {
+          'strDrink': 'Classic Margarita',
+          'strIngredient1': 'tequila',
+          'strIngredient2': 'sweet and sour mix',
+          'strIngredient3': 'contreau'
+          }
+        )
+
+      @search_2.cocktails.create(
+        recipe: {
+          'strDrink': 'Classic Old Fashioned',
+          'strIngredient1': 'rum',
+          'strIngredient2': 'mint',
+          'strIngredient3': 'lime',
+          'strIngredient4': 'soda water'
+          }
+        )
+
+      @search_3.cocktails.create(
+        recipe: {
+          'strDrink': 'Classic Mojito',
+          'strIngredient1': 'bourbon',
+          'strIngredient2': 'angostura bitters',
+          'strIngredient3': 'sugar cube',
+          'strIngredient4': 'cocktail cherry'
+        }
+      )
     end
 
     it 'returns all searches sorted by descending order of :updated_at by default' do
       expect(Search.count).to eq(3)
-
       get '/api/v1/searches'
       results = JSON.parse(response.body)
       data = results['data']
