@@ -36,7 +36,7 @@ class Api::V1::SearchesController < ApplicationController
     render json: existing_search, status: 200 if existing_search
 
     cocktail_search = cocktail_service(query)
-    results = cocktail_search.response.body
+    results = JSON.parse(cocktail_search.response.body)
     search = create_search(query, cocktail_search.url, results)
 
     render json: search, status: 200
