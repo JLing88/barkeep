@@ -34,6 +34,7 @@ class Api::V1::SearchesController < ApplicationController
   end
 
   private
+
   def cocktail_params
     params.require(:cocktail).permit(:query)
   end

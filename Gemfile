@@ -9,6 +9,7 @@ gem 'puma', '~> 3.11'
 gem 'bootsnap', '>= 1.1.0', require: false
 gem 'fast_jsonapi'
 gem 'apipie-rails'
+gem 'faraday'
 
 group :development, :test do
   gem 'rspec-rails'

@@ -89,8 +89,11 @@ RSpec.describe "Api::V1::Searches", type: :request do
 
   describe 'POST #create' do
     it 'can create a new Search object' do
+      body = { cocktail: {query: 'margarita'} }
+
       expect(Search.count).to eq(0)
-      expect { post '/api/v1/searches?query=margarita', params: body }.to change { Search.count }.by(1)
+      binding.pry
+      expect { post '/api/v1/searches', params: body }.to change { Search.count }.by(1)
     end
   end
 end
