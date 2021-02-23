@@ -8,27 +8,51 @@ RSpec.describe "Api::V1::Searches", type: :request do
       @search_3 = create(:search, query: "old fashioned")
     end
 
-    it 'returns all searches' do
+    it 'returns all searches sorted by descending order of updated_at by default' do
       expect(Search.count).to eq(3)
 
       get '/api/v1/searches'
       results = JSON.parse(response.body)
+      data = results['data']
 
       expect(response.status).to eq(200)
       expect(results).to have_key('data')
-      expect(results['data'].count).to eq(3)
-      expect(results['data'][0]['attributes']['id']).to eq(@search_3.id)
-      expect(results['data'][0]['attributes']['query']).to eq(@search_3.query)
-      expect(results['data'][0]['attributes']['url']).to eq(@search_3.url)
-      expect(results['data'][0]['attributes']['results']).to eq(@search_3.results)
-      expect(results['data'][1]['attributes']['id']).to eq(@search_2.id)
-      expect(results['data'][1]['attributes']['query']).to eq(@search_2.query)
-      expect(results['data'][1]['attributes']['url']).to eq(@search_2.url)
-      expect(results['data'][1]['attributes']['results']).to eq(@search_2.results)
-      expect(results['data'][2]['attributes']['id']).to eq(@search_1.id)
-      expect(results['data'][2]['attributes']['query']).to eq(@search_1.query)
-      expect(results['data'][2]['attributes']['url']).to eq(@search_1.url)
-      expect(results['data'][2]['attributes']['results']).to eq(@search_1.results)
+      expect(data.count).to eq(3)
+      expect(data[0]['attributes']['id']).to eq(@search_3.id)
+      expect(data[0]['attributes']['query']).to eq(@search_3.query)
+      expect(data[0]['attributes']['url']).to eq(@search_3.url)
+      expect(data[0]['attributes']['results']).to eq(@search_3.results)
+      expect(data[1]['attributes']['id']).to eq(@search_2.id)
+      expect(data[1]['attributes']['query']).to eq(@search_2.query)
+      expect(data[1]['attributes']['url']).to eq(@search_2.url)
+      expect(data[1]['attributes']['results']).to eq(@search_2.results)
+      expect(data[2]['attributes']['id']).to eq(@search_1.id)
+      expect(data[2]['attributes']['query']).to eq(@search_1.query)
+      expect(data[2]['attributes']['url']).to eq(@search_1.url)
+      expect(data[2]['attributes']['results']).to eq(@search_1.results)
+    end
+
+    it 'can order all searches in ascending order if requested' do
+      expect(Search.count).to eq(3)
+
+      get '/api/v1/searches?order=asc'
+      results = JSON.parse(response.body)
+      data = results['data']
+
+      expect(results).to have_key('data')
+      expect(data.count).to eq(3)
+      expect(data[0]['attributes']['id']).to eq(@search_1.id)
+      expect(data[0]['attributes']['query']).to eq(@search_1.query)
+      expect(data[0]['attributes']['url']).to eq(@search_1.url)
+      expect(data[0]['attributes']['results']).to eq(@search_1.results)
+      expect(data[1]['attributes']['id']).to eq(@search_2.id)
+      expect(data[1]['attributes']['query']).to eq(@search_2.query)
+      expect(data[1]['attributes']['url']).to eq(@search_2.url)
+      expect(data[1]['attributes']['results']).to eq(@search_2.results)
+      expect(data[2]['attributes']['id']).to eq(@search_3.id)
+      expect(data[2]['attributes']['query']).to eq(@search_3.query)
+      expect(data[2]['attributes']['url']).to eq(@search_3.url)
+      expect(data[2]['attributes']['results']).to eq(@search_3.results)
     end
   end
 
@@ -43,13 +67,14 @@ RSpec.describe "Api::V1::Searches", type: :request do
 
       get "/api/v1/searches/#{@search_1.id}"
       results = JSON.parse(response.body)
+      data = results['data']
 
       expect(response.status).to eq(200)
       expect(results).to have_key('data')
-      expect(results['data']['attributes']['id']).to eq(@search_1.id)
-      expect(results['data']['attributes']['query']).to eq(@search_1.query)
-      expect(results['data']['attributes']['url']).to eq(@search_1.url)
-      expect(results['data']['attributes']['results']).to eq(@search_1.results)
+      expect(data['attributes']['id']).to eq(@search_1.id)
+      expect(data['attributes']['query']).to eq(@search_1.query)
+      expect(data['attributes']['url']).to eq(@search_1.url)
+      expect(data['attributes']['results']).to eq(@search_1.results)
 
       get "/api/v1/searches/#{@search_2.id}"
       results = JSON.parse(response.body)
