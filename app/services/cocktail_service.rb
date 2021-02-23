@@ -16,4 +16,8 @@ class CocktailService
   def conn
     Faraday.new(url: url)
   end
+
+  def encode_spaces
+    query.gsub(' ', '%20')
+  end
 end

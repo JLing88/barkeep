@@ -5,23 +5,30 @@ RSpec.describe "Api::V1::Searches", type: :request do
     before(:each) do
       @search_1 = create(:search)
       @search_2 = create(:search, query: "mojito")
+      @search_3 = create(:search, query: "old fashioned")
     end
 
     it 'returns all searches' do
-      expect(Search.count).to eq(2)
+      expect(Search.count).to eq(3)
 
       get '/api/v1/searches'
       results = JSON.parse(response.body)
 
       expect(response.status).to eq(200)
       expect(results).to have_key('data')
-      expect(results['data'].count).to eq(2)
-      expect(results['data'][0]['attributes']['id']).to eq(@search_2.id)
-      expect(results['data'][0]['attributes']['query']).to eq(@search_2.query)
-      expect(results['data'][0]['attributes']['url']).to eq(@search_2.url)
-      expect(results['data'][1]['attributes']['id']).to eq(@search_1.id)
-      expect(results['data'][1]['attributes']['query']).to eq(@search_1.query)
-      expect(results['data'][1]['attributes']['url']).to eq(@search_1.url)
+      expect(results['data'].count).to eq(3)
+      expect(results['data'][0]['attributes']['id']).to eq(@search_3.id)
+      expect(results['data'][0]['attributes']['query']).to eq(@search_3.query)
+      expect(results['data'][0]['attributes']['url']).to eq(@search_3.url)
+      expect(results['data'][0]['attributes']['results']).to eq(@search_3.results)
+      expect(results['data'][1]['attributes']['id']).to eq(@search_2.id)
+      expect(results['data'][1]['attributes']['query']).to eq(@search_2.query)
+      expect(results['data'][1]['attributes']['url']).to eq(@search_2.url)
+      expect(results['data'][1]['attributes']['results']).to eq(@search_2.results)
+      expect(results['data'][2]['attributes']['id']).to eq(@search_1.id)
+      expect(results['data'][2]['attributes']['query']).to eq(@search_1.query)
+      expect(results['data'][2]['attributes']['url']).to eq(@search_1.url)
+      expect(results['data'][2]['attributes']['results']).to eq(@search_1.results)
     end
   end
 
@@ -42,6 +49,7 @@ RSpec.describe "Api::V1::Searches", type: :request do
       expect(results['data']['attributes']['id']).to eq(@search_1.id)
       expect(results['data']['attributes']['query']).to eq(@search_1.query)
       expect(results['data']['attributes']['url']).to eq(@search_1.url)
+      expect(results['data']['attributes']['results']).to eq(@search_1.results)
 
       get "/api/v1/searches/#{@search_2.id}"
       results = JSON.parse(response.body)
@@ -93,13 +101,21 @@ RSpec.describe "Api::V1::Searches", type: :request do
 
       expect(Search.count).to eq(0)
       expect { post '/api/v1/searches', params: body }.to change { Search.count }.by(1)
+
+      result = JSON.parse(response.body)
+
+      expect(response.status).to eq(200)
+      expect(result).to have_key('id')
+      expect(result['query']).to eq(body[:cocktail][:query])
+      expect(result).to have_key('url')
+      expect(result).to have_key('results')
     end
 
     it 'returns 422 if invalid params are provided' do
-      body = { not_a_cocktail: { query: 'something' } }
+      invalid_body = { not_a_cocktail: { query: 'something' } }
 
       expect(Search.count).to eq(0)
-      expect { post '/api/v1/searches', params: body }.to_not change { Search.count }
+      expect { post '/api/v1/searches', params: invalid_body }.to_not change { Search.count }
 
       result = JSON.parse(response.body)
 
