@@ -8,7 +8,7 @@ RSpec.describe "Api::V1::Searches", type: :request do
       @search_3 = create(:search, query: "old fashioned")
     end
 
-    it 'returns all searches sorted by descending order of updated_at by default' do
+    it 'returns all searches sorted by descending order of :updated_at by default' do
       expect(Search.count).to eq(3)
 
       get '/api/v1/searches'
@@ -32,7 +32,7 @@ RSpec.describe "Api::V1::Searches", type: :request do
       expect(data[2]['attributes']['results']).to eq(@search_1.results)
     end
 
-    it 'can order all searches in ascending order if requested' do
+    it 'can order all searches in ascending order by :updated_at' do
       expect(Search.count).to eq(3)
 
       get '/api/v1/searches?order=asc'
@@ -54,7 +54,91 @@ RSpec.describe "Api::V1::Searches", type: :request do
       expect(data[2]['attributes']['url']).to eq(@search_3.url)
       expect(data[2]['attributes']['results']).to eq(@search_3.results)
     end
+
+    it 'can order all searches in descending order' do
+      expect(Search.count).to eq(3)
+
+      get '/api/v1/searches?order=desc'
+      results = JSON.parse(response.body)
+      data = results['data']
+
+      expect(response.status).to eq(200)
+      expect(results).to have_key('data')
+      expect(data.count).to eq(3)
+      expect(data[0]['attributes']['id']).to eq(@search_3.id)
+      expect(data[0]['attributes']['query']).to eq(@search_3.query)
+      expect(data[0]['attributes']['url']).to eq(@search_3.url)
+      expect(data[0]['attributes']['results']).to eq(@search_3.results)
+      expect(data[1]['attributes']['id']).to eq(@search_2.id)
+      expect(data[1]['attributes']['query']).to eq(@search_2.query)
+      expect(data[1]['attributes']['url']).to eq(@search_2.url)
+      expect(data[1]['attributes']['results']).to eq(@search_2.results)
+      expect(data[2]['attributes']['id']).to eq(@search_1.id)
+      expect(data[2]['attributes']['query']).to eq(@search_1.query)
+      expect(data[2]['attributes']['url']).to eq(@search_1.url)
+      expect(data[2]['attributes']['results']).to eq(@search_1.results)
+    end
+
+    it 'can order by :query in descending order' do
+      expect(Search.count).to eq(3)
+
+      get '/api/v1/searches?order=alpha-desc'
+      results = JSON.parse(response.body)
+      data = results['data']
+
+      expect(results).to have_key('data')
+      expect(data.count).to eq(3)
+      expect(data[0]['attributes']['id']).to eq(@search_3.id)
+      expect(data[0]['attributes']['query']).to eq(@search_3.query)
+      expect(data[0]['attributes']['url']).to eq(@search_3.url)
+      expect(data[0]['attributes']['results']).to eq(@search_3.results)
+      expect(data[1]['attributes']['id']).to eq(@search_2.id)
+      expect(data[1]['attributes']['query']).to eq(@search_2.query)
+      expect(data[1]['attributes']['url']).to eq(@search_2.url)
+      expect(data[1]['attributes']['results']).to eq(@search_2.results)
+      expect(data[2]['attributes']['id']).to eq(@search_1.id)
+      expect(data[2]['attributes']['query']).to eq(@search_1.query)
+      expect(data[2]['attributes']['url']).to eq(@search_1.url)
+      expect(data[2]['attributes']['results']).to eq(@search_1.results)
+    end
+
+  it 'can order by query in descending order' do
+    expect(Search.count).to eq(3)
+
+    get '/api/v1/searches?order=asc'
+    results = JSON.parse(response.body)
+    data = results['data']
+
+    expect(results).to have_key('data')
+    expect(data.count).to eq(3)
+    expect(data[0]['attributes']['id']).to eq(@search_1.id)
+    expect(data[0]['attributes']['query']).to eq(@search_1.query)
+    expect(data[0]['attributes']['url']).to eq(@search_1.url)
+    expect(data[0]['attributes']['results']).to eq(@search_1.results)
+    expect(data[1]['attributes']['id']).to eq(@search_2.id)
+    expect(data[1]['attributes']['query']).to eq(@search_2.query)
+    expect(data[1]['attributes']['url']).to eq(@search_2.url)
+    expect(data[1]['attributes']['results']).to eq(@search_2.results)
+    expect(data[2]['attributes']['id']).to eq(@search_3.id)
+    expect(data[2]['attributes']['query']).to eq(@search_3.query)
+    expect(data[2]['attributes']['url']).to eq(@search_3.url)
+    expect(data[2]['attributes']['results']).to eq(@search_3.results)
   end
+
+  it 'can filter :query by string match' do
+    expect(Search.count).to eq(3)
+
+    get '/api/v1/searches?filter=ma'
+    results = JSON.parse(response.body)
+    data = results['data']
+
+    expect(results).to have_key('data')
+    expect(data.count).to eq(1)
+    expect(data[0]['attributes']['query']).to eq(@search_1.query)
+    expect(data[0]['attributes']['url']).to eq(@search_1.url)
+    expect(data[0]['attributes']['results']).to eq(@search_1.results)
+  end
+end
 
   describe 'GET #show' do
     before(:each) do
@@ -146,6 +230,21 @@ RSpec.describe "Api::V1::Searches", type: :request do
 
       expect(response.status).to eq(422)
       expect(result['error']).to eq("Missing parameter cocktail")
+    end
+
+    it 'can handle multiple word queries' do
+      body = { cocktail: { query: 'old fashioned' } }
+
+      expect(Search.count).to eq(0)
+      expect { post '/api/v1/searches', params: body }.to change { Search.count }.by(1)
+
+      result = JSON.parse(response.body)
+
+      expect(response.status).to eq(200)
+      expect(result).to have_key('id')
+      expect(result['query']).to eq(body[:cocktail][:query])
+      expect(result).to have_key('url')
+      expect(result).to have_key('results')
     end
   end
 end

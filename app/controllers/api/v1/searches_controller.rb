@@ -1,7 +1,11 @@
 class Api::V1::SearchesController < ApplicationController
+  include SortAndFilterHelper
+
   api :GET, '/v1/searches'
+  param :order, String, required: false, desc: "provide 'asc' or 'desc' to sort by date"
+  param :filter, String, required: false, desc: "provide 'alpha-asc' or alpha-desc' to sort alphabetically"
   def index
-    searches = Search.all.order(updated_at: :desc)
+    searches = Search.all.order(sorted_by(params)).where('query LIKE ?', "%#{filter_by(params)}%")
     results = SearchSerializer.new(searches).serializable_hash
 
     render json: results, status: 200
