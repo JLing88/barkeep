@@ -48,7 +48,6 @@ filter=<string> #filters the results based on the query string of the searches
 ```
 DESCRIPTION: Returns a list of all previous searches and their associated cocktail recipes. If a query parameter is provided, the response will be sorted OR filtered.
 
-[Example Request](#index)
 ***
 
 ```
@@ -59,7 +58,6 @@ Required parameters:
 ```
 DESCRIPTION: Returns a single search and its associated cocktail recipes.
 
-[Example Request](#show)
 ***
 ```
 DELETE /api/v1/searches/:id
@@ -68,7 +66,6 @@ Required parameters:
 ```
 DESCRIPTION: Deletes the search object with the corresponing id or if it is not found, a 404 not found response.
 
-[Example Request](#destroy)
 ***
 ```
 POST /api/v1/searches
@@ -78,8 +75,9 @@ cocktail[:query]
 ```
 DESCRIPTION: Creates a new search OR returns an existing search of the same query parameter.
 
-[Example Request](#create)
 ***
+
+[Example Requests and Responses](#example-requests-and-responses)
 ## Technologies Used
 
 [apipie-rails](https://github.com/Apipie/apipie-rails): Used for living api documentation. This was the first time I've used it, but found it to be pretty neat! It does muddy up the controller code a bit, however. \
@@ -103,7 +101,7 @@ DESCRIPTION: Creates a new search OR returns an existing search of the same quer
 * I intentionally left out the UPDATE action on the `searches_controller`. It didn't seem that updating the search objects made sense in this scenario as the information is static.
 * Build out the front end (which I plan to do!) so that the application is friendlier for non-tech users.
 
-## Example Responses
+## Example Requests and Responses
 #### Index
 `GET /api/v1/searches` 
 ```
