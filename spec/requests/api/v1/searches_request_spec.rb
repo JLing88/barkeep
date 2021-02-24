@@ -257,8 +257,6 @@ end
 
   describe 'DELETE #destroy' do
     before(:each) do
-      # @search_2 = create(:search, query: 'mojito')
-
       @margarita_search = create(:search)
       @mojito_search = create(:search, query: 'mojito')
 
@@ -317,19 +315,20 @@ end
   end
 
   describe 'POST #create' do
-    it 'can create a new Search object' do
+    it 'can create a new Search object and associated Cocktails' do
       body = { cocktail: { query: 'margarita' } }
 
       expect(Search.count).to eq(0)
       expect { post '/api/v1/searches', params: body }.to change { Search.count }.by(1)
+      search = Search.last
 
       result = JSON.parse(response.body)
 
       expect(response.status).to eq(200)
-      expect(result).to have_key('id')
-      expect(result['query']).to eq(body[:cocktail][:query])
-      expect(result).to have_key('url')
-      expect(result).to have_key('results')
+      expect(result['data']['id']).to eq(search.id.to_s)
+      expect(result['data']['type']).to eq('search')
+      expect(result['data']['attributes']['query']).to eq(body[:cocktail][:query])
+      expect(result['data']).to have_key('relationships')
     end
 
     it 'returns 422 if invalid params are provided' do
@@ -350,12 +349,14 @@ end
       expect(Search.count).to eq(0)
       expect { post '/api/v1/searches', params: body }.to change { Search.count }.by(1)
 
+      search = Search.last
+
       result = JSON.parse(response.body)
       expect(response.status).to eq(200)
-      expect(result).to have_key('id')
-      expect(result['query']).to eq('old fashioned')
-      expect(result).to have_key('url')
-      expect(result).to have_key('results')
+      expect(result['data']['id']).to eq(search.id.to_s)
+      expect(result['data']['attributes']['query']).to eq('old fashioned')
+      expect(result['data']['attributes']).to have_key('url')
+      expect(result['data']).to have_key('relationships')
     end
   end
 end

@@ -38,13 +38,16 @@ class Api::V1::SearchesController < ApplicationController
 
     existing_search = Search.find_by(query: query)
     # if search is already in the database we'll just return that
-    render json: existing_search, status: 200 if existing_search
+    if existing_search
+      render json: serialize_search(existing_search), status: 200
+      return
+    end
 
     cocktail_search = cocktail_service(query)
     results = JSON.parse(cocktail_search.response.body)
-    search = create_search(query, cocktail_search.url, results)
+    search = create_search_and_cocktails(query, cocktail_search.url, results)
 
-    render json: search, status: 200
+    render json: serialize_search(search), status: 200
   end
 
   private
@@ -53,11 +56,20 @@ class Api::V1::SearchesController < ApplicationController
     params.require(:cocktail).permit(:query)
   end
 
-  def create_search(query, url, results)
-    Search.create!(query: query, url: url, results: results)
+  def create_search_and_cocktails(query, url, results)
+    search = Search.create!(query: query, url: url)
+    results['drinks'].each do |drink|
+      search.cocktails.create(recipe: drink)
+    end
+
+    search
   end
 
   def cocktail_service(query)
     CocktailService.new(query)
+  end
+
+  def serialize_search(search)
+    SearchSerializer.new(search, include: [:cocktails])
   end
 end
