@@ -29,6 +29,11 @@ This section assumes you have an installation of the Ruby and Rails versions ind
 
 The living API documentation can be viewed at: https://polar-crag-06475.herokuapp.com/apipie
 
+### Data Source
+```
+https://www.thecocktaildb.com/api.php
+```
+
 ### Base URL
 ```
 https://polar-crag-06475.herokuapp.com
