@@ -146,37 +146,37 @@ RSpec.describe "Api::V1::Searches", type: :request do
       expect(data[2]['attributes']['url']).to eq(@margarita_search.url)
     end
 
-  it 'can order by query in descending order' do
-    expect(Search.count).to eq(3)
+    it 'can order by query in descending order' do
+      expect(Search.count).to eq(3)
 
-    get '/api/v1/searches?order=asc'
-    results = JSON.parse(response.body)
-    data = results['data']
+      get '/api/v1/searches?order=asc'
+      results = JSON.parse(response.body)
+      data = results['data']
 
-    expect(results).to have_key('data')
-    expect(data.count).to eq(3)
-    expect(data[0]['attributes']['id']).to eq(@margarita_search.id)
-    expect(data[0]['attributes']['query']).to eq(@margarita_search.query)
-    expect(data[0]['attributes']['url']).to eq(@margarita_search.url)
-    expect(data[1]['attributes']['id']).to eq(@mojito_search.id)
-    expect(data[1]['attributes']['query']).to eq(@mojito_search.query)
-    expect(data[1]['attributes']['url']).to eq(@mojito_search.url)
-    expect(data[2]['attributes']['id']).to eq(@old_fashioned_search.id)
-    expect(data[2]['attributes']['query']).to eq(@old_fashioned_search.query)
-    expect(data[2]['attributes']['url']).to eq(@old_fashioned_search.url)
+      expect(results).to have_key('data')
+      expect(data.count).to eq(3)
+      expect(data[0]['attributes']['id']).to eq(@margarita_search.id)
+      expect(data[0]['attributes']['query']).to eq(@margarita_search.query)
+      expect(data[0]['attributes']['url']).to eq(@margarita_search.url)
+      expect(data[1]['attributes']['id']).to eq(@mojito_search.id)
+      expect(data[1]['attributes']['query']).to eq(@mojito_search.query)
+      expect(data[1]['attributes']['url']).to eq(@mojito_search.url)
+      expect(data[2]['attributes']['id']).to eq(@old_fashioned_search.id)
+      expect(data[2]['attributes']['query']).to eq(@old_fashioned_search.query)
+      expect(data[2]['attributes']['url']).to eq(@old_fashioned_search.url)
+    end
+
+    it 'can filter :query by string match' do
+      expect(Search.count).to eq(3)
+
+      get '/api/v1/searches?filter=ma'
+      results = JSON.parse(response.body)
+      data = results['data']
+
+      expect(results).to have_key('data')
+      expect(data.count).to eq(1)
+      expect(data[0]['attributes']['query']).to eq(@margarita_search.query)
+      expect(data[0]['attributes']['url']).to eq(@margarita_search.url)
+    end
   end
-
-  it 'can filter :query by string match' do
-    expect(Search.count).to eq(3)
-
-    get '/api/v1/searches?filter=ma'
-    results = JSON.parse(response.body)
-    data = results['data']
-
-    expect(results).to have_key('data')
-    expect(data.count).to eq(1)
-    expect(data[0]['attributes']['query']).to eq(@margarita_search.query)
-    expect(data[0]['attributes']['url']).to eq(@margarita_search.url)
-  end
-end
 end
