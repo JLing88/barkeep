@@ -38,7 +38,10 @@ class Api::V1::SearchesController < ApplicationController
 
     existing_search = Search.find_by(query: query)
     # if search is already in the database we'll just return that
-    render json: existing_search, status: 200 if existing_search
+    if existing_search
+      render json: existing_search, status: 200
+      return 
+    end
 
     cocktail_search = cocktail_service(query)
     results = JSON.parse(cocktail_search.response.body)
