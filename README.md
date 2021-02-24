@@ -31,7 +31,7 @@ The living API documentation can be viewed at: https://polar-crag-06475.herokuap
 
 ### Data Source
 
-[The CocktailDB](https://github.com/JLing88/barkeep)
+[The CocktailDB](https://www.thecocktaildb.com/api.php)
 
 
 ### Base URL
